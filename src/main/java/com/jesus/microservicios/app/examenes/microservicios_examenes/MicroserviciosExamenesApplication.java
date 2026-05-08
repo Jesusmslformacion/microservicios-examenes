@@ -3,7 +3,7 @@ package com.jesus.microservicios.app.examenes.microservicios_examenes;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
 
 @EnableEurekaClient
 @SpringBootApplication
