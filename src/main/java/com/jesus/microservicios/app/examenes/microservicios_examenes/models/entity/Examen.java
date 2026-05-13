@@ -1,12 +1,19 @@
 package com.jesus.microservicios.app.examenes.microservicios_examenes.models.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -25,6 +32,18 @@ public class Examen {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_at")
     private Date createAt;
+
+    // Evitar la serialización de la propiedad "examen" en Pregunta para prevenir referencias circulares
+    @JsonIgnoreProperties(value = {"examen"}, allowSetters = true)
+    // Relación uno a muchos con Pregunta
+    @OneToMany( mappedBy = "examen", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Pregunta> preguntas;
+
+    
+
+    public Examen() {
+        this.preguntas = new ArrayList<>();
+    }
 
     @PrePersist
     public void prePersist() {
@@ -54,6 +73,29 @@ public class Examen {
     public void setCreateAt(Date createAt) {
         this.createAt = createAt;
     }
+
+    public List<Pregunta> getPreguntas() {
+        return preguntas;
+    }
+
+    public void setPreguntas(List<Pregunta> preguntas) {
+        this.preguntas.clear();
+        preguntas.forEach(this::addPregunta);
+    }
+
+    public void addPregunta(Pregunta pregunta) {
+        this.preguntas.add(pregunta);
+        pregunta.setExamen(this);
+    }
+
+    public void removePregunta(Pregunta pregunta) {
+        this.preguntas.remove(pregunta);
+        pregunta.setExamen(null);
+    }
+
+
+
+    
 
     
 }
